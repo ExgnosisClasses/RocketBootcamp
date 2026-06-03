@@ -1,3 +1,4 @@
 # Rocket Student 
+## June 8 2026
 
-This repository contains the student materials for the Rocket Bootcamp on October 13, 2025
+This repository contains the materials for the Software Craftsmanship section of the June 8  2026 bootcamp
