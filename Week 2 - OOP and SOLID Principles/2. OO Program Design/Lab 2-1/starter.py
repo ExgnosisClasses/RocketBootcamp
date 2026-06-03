@@ -1,6 +1,6 @@
-# =========================
-# Starter C0de
-# =========================
+# =========================================
+# Object-Oriented Programming Lab - Starter
+# =========================================
 
 from abc import ABC, abstractmethod
 from typing import List
@@ -36,8 +36,9 @@ class BaseAccount(Account):
             raise ValueError("amount must be positive")
         self._balance += amount
 
-    # TODO: Implement withdraw with simple guard (no overdraft)
-    # Deduct only if there is enough balance; return True/False
+    # TODO: Implement withdraw with a simple guard (no overdraft).
+    # Deduct only if there is enough balance; return True if it succeeded,
+    # False otherwise. Reject non-positive amounts by returning False.
     def withdraw(self, amount: float) -> bool:
         # TODO: your code here
         pass
@@ -51,40 +52,44 @@ class BaseAccount(Account):
 
 
 # 3) Inheritance + Polymorphism:
-#    SavingsAccount and CheckingAccount share BaseAccount behavior,
-#    but specialize withdrawal rules (same message -> different behavior).
+#    SavingsAccount and CheckingAccount share BaseAccount behaviour,
+#    but specialize withdrawal rules (same message -> different behaviour).
 
 class SavingsAccount(BaseAccount):
     """No overdraft; earns a tiny monthly interest via monthly_process()."""
 
-    # TODO: Implement monthly_process to add interest (e.g., 0.2% of balance)
+    # TODO: Implement monthly_process to add 0.2% interest to the balance.
     def monthly_process(self) -> None:
         # TODO: your code here
         pass
 
 
 class CheckingAccount(BaseAccount):
-    """Allows small overdraft with a fee when overdrawn."""
+    """Allows a small overdraft with a fee when overdrawn."""
 
-    def __init__(self, owner: str, opening_balance: float = 0.0, overdraft_limit: float = 50.0, fee: float = 5.0):
+    def __init__(self, owner: str, opening_balance: float = 0.0,
+                 overdraft_limit: float = 50.0, fee: float = 5.0):
         super().__init__(owner, opening_balance)
         self.overdraft_limit = float(overdraft_limit)
         self.fee = float(fee)
 
-    # TODO: Override withdraw:
-    # - permit going negative down to -overdraft_limit (charge fee if crosses below 0)
-    # - return True/False
+    # TODO: Override withdraw.
+    # - Permit going negative down to -overdraft_limit.
+    # - If the balance ends up below 0 after the withdrawal, charge the fee.
+    # - Return True on success, False if the overdraft limit would be exceeded
+    #   or the amount is not positive.
     def withdraw(self, amount: float) -> bool:
         # TODO: your code here
         pass
 
     # TODO: Implement monthly_process to charge a $1 maintenance fee
+    # (i.e., subtract 1.0 from the balance).
     def monthly_process(self) -> None:
         # TODO: your code here
         pass
 
 
-# 4) Collaboration / “message passing”: a simple Bank that sends messages to accounts
+# 4) Collaboration / "message passing": a simple Bank that sends messages to accounts
 class Bank:
     def __init__(self, accounts: List[Account]):
         self.accounts = list(accounts)
@@ -93,7 +98,7 @@ class Bank:
         return sum(acct.balance() for acct in self.accounts)
 
     def run_month_end(self) -> None:
-        # Polymorphic call: each account responds with its own monthly behavior
+        # Polymorphic call: each account responds with its own monthly behaviour.
         for acct in self.accounts:
             # Some accounts implement monthly_process; others might not.
             # We can "duck type" safely with hasattr.
@@ -101,7 +106,7 @@ class Bank:
                 getattr(acct, "monthly_process")()
 
 
-# 5) Tiny test drive — run this file to see it work
+# 5) Tiny test drive: run this file to see it work
 if __name__ == "__main__":
     s = SavingsAccount("Ava", 100.0)
     c = CheckingAccount("Ben", 25.0, overdraft_limit=50.0, fee=5.0)
@@ -111,11 +116,13 @@ if __name__ == "__main__":
 
     print("Before withdrawals:", s, c)
 
-    # TODO: Try a few withdrawals:
-    # - withdraw 120 from savings (should succeed if enough)
-    # - withdraw 70 from checking (may go overdraft and charge fee)
-    # Print both accounts after each step to observe differences.
-    # TODO: your code here
+    # The two withdrawal calls below exercise the methods you will implement.
+    # Before you implement them, you will see "None" instead of True/False,
+    # and balances will not change. After you implement them, the savings
+    # withdrawal should succeed (150 - 120 = 30) and the checking withdrawal
+    # should overdraft (50 - 70 - 5 fee = -25).
+    print("Savings withdraw 120 ->", s.withdraw(120), s)
+    print("Checking withdraw 70 ->", c.withdraw(70), c)
 
     bank = Bank([s, c])
     print("\nRunning month end...")
